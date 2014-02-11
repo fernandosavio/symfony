@@ -16,12 +16,18 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
+    private static $pfd16bb2d9829eb444172541e25c08b76 = array(
+            'baz_class' => 'BazClass',
+            'foo_class' => 'Bar\\FooClass',
+            'foo' => 'bar',
+        );
+
     /**
      * Constructor.
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag($this->getDefaultParameters()));
+        parent::__construct(new ParameterBag(self::$pfd16bb2d9829eb444172541e25c08b76));
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',
@@ -287,19 +293,5 @@ class ProjectServiceContainer extends Container
         $instance->pub = 'pub';
 
         return $instance;
-    }
-
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return array(
-            'baz_class' => 'BazClass',
-            'foo_class' => 'Bar\\FooClass',
-            'foo' => 'bar',
-        );
     }
 }

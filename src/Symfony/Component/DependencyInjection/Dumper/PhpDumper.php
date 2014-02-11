@@ -54,6 +54,7 @@ class PhpDumper extends Dumper
     private $variableCount;
     private $reservedVariables = array('instance', 'class');
     private $expressionLanguage;
+    private $parameterArgName;
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
@@ -104,6 +105,8 @@ class PhpDumper extends Dumper
             'base_class' => 'Container',
             'namespace' => '',
         ), $options);
+
+        $this->parameterArgName = 'p'.md5($options['class']);
 
         $code = $this->startClass($options['class'], $options['base_class'], $options['namespace']);
 
@@ -764,16 +767,18 @@ EOF;
      */
     private function addConstructor()
     {
-        $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
+        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
 
         $code = <<<EOF
+
+    private static \${$this->parameterArgName} = $parameters;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        parent::__construct($arguments);
+        parent::__construct(new ParameterBag(self::\${$this->parameterArgName}));
 
 EOF;
 
@@ -801,23 +806,17 @@ EOF;
      */
     private function addFrozenConstructor()
     {
+        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
+
         $code = <<<EOF
 
-    private \$parameters;
+    private static \${$this->parameterArgName} = $parameters;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-EOF;
-
-        if ($this->container->getParameterBag()->all()) {
-            $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
-        }
-
-        $code .= <<<EOF
-
         \$this->services =
         \$this->scopedServices =
         \$this->scopeStacks = array();
@@ -905,8 +904,6 @@ EOF;
             return '';
         }
 
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
-
         $code = '';
         if ($this->container->isFrozen()) {
             $code .= <<<EOF
@@ -918,11 +915,11 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        if (!(isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters))) {
+        if (!(isset(self::\${$this->parameterArgName}[\$name]) || array_key_exists(\$name, self::\${$this->parameterArgName}))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
         }
 
-        return \$this->parameters[\$name];
+        return self::\${$this->parameterArgName}[\$name];
     }
 
     /**
@@ -932,7 +929,7 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        return isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters);
+        return isset(self::\${$this->parameterArgName}[\$name]) || array_key_exists(\$name, self::\${$this->parameterArgName});
     }
 
     /**
@@ -949,27 +946,14 @@ EOF;
     public function getParameterBag()
     {
         if (null === \$this->parameterBag) {
-            \$this->parameterBag = new FrozenParameterBag(\$this->parameters);
+            \$this->parameterBag = new FrozenParameterBag(self::\${$this->parameterArgName});
         }
 
         return \$this->parameterBag;
     }
+
 EOF;
         }
-
-        $code .= <<<EOF
-
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return $parameters;
-    }
-
-EOF;
 
         return $code;
     }

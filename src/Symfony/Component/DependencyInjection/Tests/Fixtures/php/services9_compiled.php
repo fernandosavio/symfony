@@ -16,15 +16,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private $parameters;
+    private static $pfd16bb2d9829eb444172541e25c08b76 = array(
+            'baz_class' => 'BazClass',
+            'foo_class' => 'Bar\\FooClass',
+            'foo' => 'bar',
+        );
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->parameters = $this->getDefaultParameters();
-
         $this->services =
         $this->scopedServices =
         $this->scopeStacks = array();
@@ -262,11 +264,11 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters))) {
+        if (!(isset(self::$pfd16bb2d9829eb444172541e25c08b76[$name]) || array_key_exists($name, self::$pfd16bb2d9829eb444172541e25c08b76))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
 
-        return $this->parameters[$name];
+        return self::$pfd16bb2d9829eb444172541e25c08b76[$name];
     }
 
     /**
@@ -276,7 +278,7 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters);
+        return isset(self::$pfd16bb2d9829eb444172541e25c08b76[$name]) || array_key_exists($name, self::$pfd16bb2d9829eb444172541e25c08b76);
     }
 
     /**
@@ -293,22 +295,9 @@ class ProjectServiceContainer extends Container
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {
-            $this->parameterBag = new FrozenParameterBag($this->parameters);
+            $this->parameterBag = new FrozenParameterBag(self::$pfd16bb2d9829eb444172541e25c08b76);
         }
 
         return $this->parameterBag;
-    }
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return array(
-            'baz_class' => 'BazClass',
-            'foo_class' => 'Bar\\FooClass',
-            'foo' => 'bar',
-        );
     }
 }

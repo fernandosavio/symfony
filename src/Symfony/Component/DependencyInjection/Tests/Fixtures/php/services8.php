@@ -16,22 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct(new ParameterBag($this->getDefaultParameters()));
-    }
-
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return array(
+    private static $pfd16bb2d9829eb444172541e25c08b76 = array(
             'foo' => '%baz%',
             'baz' => 'bar',
             'bar' => 'foo is %%foo bar',
@@ -47,5 +32,12 @@ class ProjectServiceContainer extends Container
                 7 => 'null',
             ),
         );
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(new ParameterBag(self::$pfd16bb2d9829eb444172541e25c08b76));
     }
 }
