@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private static $pfd16bb2d9829eb444172541e25c08b76 = array(
+    private static $parameters = array(
             'empty_value' => '',
             'some_string' => '-',
         );
@@ -61,11 +61,11 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        if (!(isset(self::$pfd16bb2d9829eb444172541e25c08b76[$name]) || array_key_exists($name, self::$pfd16bb2d9829eb444172541e25c08b76))) {
+        if (!(isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
 
-        return self::$pfd16bb2d9829eb444172541e25c08b76[$name];
+        return self::$parameters[$name];
     }
 
     /**
@@ -75,7 +75,7 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        return isset(self::$pfd16bb2d9829eb444172541e25c08b76[$name]) || array_key_exists($name, self::$pfd16bb2d9829eb444172541e25c08b76);
+        return isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters);
     }
 
     /**
@@ -92,7 +92,7 @@ class ProjectServiceContainer extends Container
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {
-            $this->parameterBag = new FrozenParameterBag(self::$pfd16bb2d9829eb444172541e25c08b76);
+            $this->parameterBag = new FrozenParameterBag(self::$parameters);
         }
 
         return $this->parameterBag;

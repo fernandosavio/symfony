@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private static $pfd16bb2d9829eb444172541e25c08b76 = array(
+    private static $parameters = array(
 
         );
 
@@ -25,6 +25,6 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag(self::$pfd16bb2d9829eb444172541e25c08b76));
+        parent::__construct(new ParameterBag(self::$parameters));
     }
 }

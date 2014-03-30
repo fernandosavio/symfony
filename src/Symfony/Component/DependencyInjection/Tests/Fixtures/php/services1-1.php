@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class Container extends AbstractContainer
 {
-    private static $p0e7278cda02a9c0446dcc75a4df34eb2 = array(
+    private static $parameters = array(
 
         );
 
@@ -26,6 +26,6 @@ class Container extends AbstractContainer
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag(self::$p0e7278cda02a9c0446dcc75a4df34eb2));
+        parent::__construct(new ParameterBag(self::$parameters));
     }
 }

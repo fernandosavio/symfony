@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private static $pfd16bb2d9829eb444172541e25c08b76 = array(
+    private static $parameters = array(
 
         );
 

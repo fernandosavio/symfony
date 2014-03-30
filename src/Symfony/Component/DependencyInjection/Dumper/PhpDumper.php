@@ -54,7 +54,6 @@ class PhpDumper extends Dumper
     private $variableCount;
     private $reservedVariables = array('instance', 'class');
     private $expressionLanguage;
-    private $parameterArgName;
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
@@ -105,8 +104,6 @@ class PhpDumper extends Dumper
             'base_class' => 'Container',
             'namespace' => '',
         ), $options);
-
-        $this->parameterArgName = 'p'.md5($options['class']);
 
         $code = $this->startClass($options['class'], $options['base_class'], $options['namespace']);
 
@@ -771,14 +768,14 @@ EOF;
 
         $code = <<<EOF
 
-    private static \${$this->parameterArgName} = $parameters;
+    private static \$parameters = $parameters;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag(self::\${$this->parameterArgName}));
+        parent::__construct(new ParameterBag(self::\$parameters));
 
 EOF;
 
@@ -810,7 +807,7 @@ EOF;
 
         $code = <<<EOF
 
-    private static \${$this->parameterArgName} = $parameters;
+    private static \$parameters = $parameters;
 
     /**
      * Constructor.
@@ -915,11 +912,11 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        if (!(isset(self::\${$this->parameterArgName}[\$name]) || array_key_exists(\$name, self::\${$this->parameterArgName}))) {
+        if (!(isset(self::\$parameters[\$name]) || array_key_exists(\$name, self::\$parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
         }
 
-        return self::\${$this->parameterArgName}[\$name];
+        return self::\$parameters[\$name];
     }
 
     /**
@@ -929,7 +926,7 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        return isset(self::\${$this->parameterArgName}[\$name]) || array_key_exists(\$name, self::\${$this->parameterArgName});
+        return isset(self::\$parameters[\$name]) || array_key_exists(\$name, self::\$parameters);
     }
 
     /**
@@ -946,7 +943,7 @@ EOF;
     public function getParameterBag()
     {
         if (null === \$this->parameterBag) {
-            \$this->parameterBag = new FrozenParameterBag(self::\${$this->parameterArgName});
+            \$this->parameterBag = new FrozenParameterBag(self::\$parameters);
         }
 
         return \$this->parameterBag;
